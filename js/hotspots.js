@@ -2,7 +2,7 @@
 "use strict";
 
 (function () {
-  // Content for each hotspot
+
   const content = {
     airport: {
       title: "Airport Arrival",
@@ -27,8 +27,8 @@
     }
   };
 
-  // Track completed locations
   const completedLocations = new Set();
+  const locationOrder = ["airport", "metro", "campus"];
 
   let currentLocation = null;
   let openTimeMs = null;
@@ -52,6 +52,26 @@
     progressEl.textContent = `Progress: ${completed} / ${total} completed`;
   }
 
+  function isUnlocked(loc) {
+    const index = locationOrder.indexOf(loc);
+    if (index === 0) return true;
+
+    const previousLoc = locationOrder[index - 1];
+    return completedLocations.has(previousLoc);
+  }
+
+  function updateLockedVisuals() {
+    document.querySelectorAll(".hotspot").forEach(el => {
+      const loc = el.getAttribute("data-location");
+
+      if (!isUnlocked(loc)) {
+        el.setAttribute("opacity", 0.4);
+      } else {
+        el.setAttribute("opacity", 1);
+      }
+    });
+  }
+
   function openLocation(loc) {
     const data = content[loc];
     if (!data) return;
@@ -63,7 +83,6 @@
 
     titleEl.textContent = data.title;
     infoEl.textContent = data.info;
-
     questionBlock.innerHTML = "";
 
     const q = document.createElement("p");
@@ -111,13 +130,9 @@
   }
 
   function saveResponse(correct, timeSpentSec) {
-    console.log("SAVE CLICKED:", currentLocation);
-  
     const confidenceEl = document.getElementById("confidence");
     const confidence = confidenceEl ? Number(confidenceEl.value) : 3;
 
-
-    // Save event through data module
     window.AppData.addEvent({
       location: currentLocation,
       correct,
@@ -125,9 +140,9 @@
       timeSpent: timeSpentSec
     });
 
-    // Track completion (unique only)
     completedLocations.add(currentLocation);
     updateProgress();
+    updateLockedVisuals();
 
     const { overlay } = getOverlayEls();
     overlay.style.display = "none";
@@ -135,9 +150,16 @@
 
   function attachHotspotListeners() {
     const nodes = document.querySelectorAll(".hotspot");
+
     nodes.forEach((el) => {
       el.addEventListener("click", () => {
         const loc = el.getAttribute("data-location");
+
+        if (!isUnlocked(loc)) {
+          alert("Complete the previous location first.");
+          return;
+        }
+
         openLocation(loc);
       });
     });
@@ -146,15 +168,17 @@
   function attachExportButton() {
     const exportBtn = document.getElementById("exportBtn");
     if (!exportBtn) return;
+
     exportBtn.addEventListener("click", () => window.AppData.downloadResults());
   }
 
   function initHotspots() {
-    console.log("Hotspots initialized");
     attachHotspotListeners();
     attachExportButton();
-    updateProgress(); // initialize progress display
+    updateProgress();
+    updateLockedVisuals();
   }
 
   window.AppHotspots = { initHotspots };
+
 })();
