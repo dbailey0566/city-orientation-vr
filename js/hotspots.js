@@ -27,6 +27,9 @@
     }
   };
 
+  // Track completed locations
+  const completedLocations = new Set();
+
   let currentLocation = null;
   let openTimeMs = null;
 
@@ -37,6 +40,16 @@
       infoEl: document.getElementById("locationInfo"),
       questionBlock: document.getElementById("questionBlock")
     };
+  }
+
+  function updateProgress() {
+    const progressEl = document.getElementById("progressTracker");
+    if (!progressEl) return;
+
+    const total = Object.keys(content).length;
+    const completed = completedLocations.size;
+
+    progressEl.textContent = `Progress: ${completed} / ${total} completed`;
   }
 
   function openLocation(loc) {
@@ -76,7 +89,6 @@
     const timeSpentSec = Math.floor((Date.now() - openTimeMs) / 1000);
 
     const { questionBlock } = getOverlayEls();
-
     questionBlock.innerHTML = "";
 
     const p = document.createElement("p");
@@ -102,13 +114,17 @@
     const confidenceEl = document.getElementById("confidence");
     const confidence = confidenceEl ? Number(confidenceEl.value) : 3;
 
-    // Save event through the data module
+    // Save event through data module
     window.AppData.addEvent({
       location: currentLocation,
       correct,
       confidence,
       timeSpent: timeSpentSec
     });
+
+    // Track completion (unique only)
+    completedLocations.add(currentLocation);
+    updateProgress();
 
     const { overlay } = getOverlayEls();
     overlay.style.display = "none";
@@ -134,9 +150,8 @@
     console.log("Hotspots initialized");
     attachHotspotListeners();
     attachExportButton();
+    updateProgress(); // initialize progress display
   }
 
-  // Expose init so index.html can call it after DOM loads
   window.AppHotspots = { initHotspots };
 })();
-
