@@ -1,37 +1,103 @@
-/**
- * Hotspots Manager
- * Manages interactive hotspots in the City Orientation VR scene
- */
+// js/hotspots.js
+"use strict";
 
-class HotspotsManager {
-    constructor(scene) {
-        this.scene = scene;
-        this.hotspots = [];
+(function () {
+  // Content for each hotspot
+  const content = {
+    airport: {
+      title: "Airport Arrival",
+      info: "Immigration officers expect direct, concise answers. Avoid humor.",
+      question: "Which behavior is most appropriate at immigration?",
+      options: ["Make small talk", "Answer briefly and directly", "Ask about their day"],
+      correct: 1
+    },
+    metro: {
+      title: "Metro Station",
+      info: "Tickets must be validated before boarding.",
+      question: "Where should you validate your metro ticket?",
+      options: ["On the train", "Before entering platform", "After arrival"],
+      correct: 1
+    },
+    campus: {
+      title: "Campus Check In",
+      info: "Visit the international office first for documentation.",
+      question: "Where should you go first upon arrival?",
+      options: ["Dormitory", "Cafeteria", "International office"],
+      correct: 2
     }
+  };
 
-    addHotspot(position, label, callback) {
-        const hotspot = {
-            position: position,
-            label: label,
-            callback: callback
-        };
-        this.hotspots.push(hotspot);
-        return hotspot;
-    }
+  let currentLocation = null;
+  let openTimeMs = null;
 
-    removeHotspot(hotspot) {
-        const index = this.hotspots.indexOf(hotspot);
-        if (index > -1) {
-            this.hotspots.splice(index, 1);
-        }
-    }
+  function getOverlayEls() {
+    return {
+      overlay: document.getElementById("overlay"),
+      titleEl: document.getElementById("locationTitle"),
+      infoEl: document.getElementById("locationInfo"),
+      questionBlock: document.getElementById("questionBlock")
+    };
+  }
 
-    getHotspots() {
-        return this.hotspots;
-    }
-}
+  function openLocation(loc) {
+    const data = content[loc];
+    if (!data) return;
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = HotspotsManager;
-}
+    currentLocation = loc;
+    openTimeMs = Date.now();
+
+    const { overlay, titleEl, infoEl, questionBlock } = getOverlayEls();
+
+    titleEl.textContent = data.title;
+    infoEl.textContent = data.info;
+
+    questionBlock.innerHTML = "";
+
+    const q = document.createElement("p");
+    q.textContent = data.question;
+    questionBlock.appendChild(q);
+
+    data.options.forEach((opt, index) => {
+      const btn = document.createElement("button");
+      btn.textContent = opt;
+      btn.className = "btn";
+      btn.addEventListener("click", () => submitAnswer(index));
+      questionBlock.appendChild(btn);
+    });
+
+    overlay.style.display = "block";
+  }
+
+  function submitAnswer(selectedIndex) {
+    const data = content[currentLocation];
+    if (!data) return;
+
+    const correct = selectedIndex === data.correct;
+    const timeSpentSec = Math.floor((Date.now() - openTimeMs) / 1000);
+
+    const { questionBlock } = getOverlayEls();
+
+    questionBlock.innerHTML = "";
+
+    const p = document.createElement("p");
+    p.textContent = "Confidence level (1 low - 5 high):";
+    questionBlock.appendChild(p);
+
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.min = "1";
+    slider.max = "5";
+    slider.value = "3";
+    slider.id = "confidence";
+    questionBlock.appendChild(slider);
+
+    const submitBtn = document.createElement("button");
+    submitBtn.className = "btn";
+    submitBtn.textContent = "Submit";
+    submitBtn.addEventListener("click", () => saveResponse(correct, timeSpentSec));
+    questionBlock.appendChild(submitBtn);
+  }
+
+  function saveResponse(correct, timeSpentSec) {
+    const confidenceEl = document.getElementById("confidence");
+    const confidence = confidence
