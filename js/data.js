@@ -1,44 +1,37 @@
-/**
- * Data Manager
- * Handles data loading and management for the City Orientation VR
- */
+// js/data.js
+"use strict";
 
-class DataManager {
-    constructor() {
-        this.data = {};
-        this.modelPath = 'assets/city.glb';
-    }
+(function () {
+  const participantID = "P" + Math.floor(Math.random() * 100000);
 
-    async loadData() {
-        try {
-            // Load configuration and data
-            this.data = {
-                title: 'City Orientation VR',
-                description: 'An interactive VR experience for city navigation',
-                version: '1.0.0'
-            };
-            return this.data;
-        } catch (error) {
-            console.error('Error loading data:', error);
-            return null;
-        }
-    }
+  const sessionData = {
+    participantID,
+    startTime: new Date().toISOString(),
+    events: []
+  };
 
-    getModelPath() {
-        return this.modelPath;
-    }
+  function addEvent(eventObj) {
+    sessionData.events.push(eventObj);
+  }
 
-    getData() {
-        return this.data;
-    }
+  function downloadResults() {
+    const dataStr =
+      "data:text/json;charset=utf-8," +
+      encodeURIComponent(JSON.stringify(sessionData, null, 2));
 
-    saveLog(logData) {
-        // Future: Save logs to exports/
-        console.log('Log saved:', logData);
-    }
-}
+    const dl = document.createElement("a");
+    dl.setAttribute("href", dataStr);
+    dl.setAttribute("download", participantID + "_results.json");
+    document.body.appendChild(dl);
+    dl.click();
+    dl.remove();
+  }
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = DataManager;
-}
+  // Expose a small API to other files
+  window.AppData = {
+    participantID,
+    sessionData,
+    addEvent,
+    downloadResults
+  };
+})();
