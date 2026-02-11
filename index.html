@@ -17,23 +17,50 @@
   <div id="questionBlock"></div>
 </div>
 
-<a-scene>
+<a-scene cursor="rayOrigin: mouse">
+
   <a-sky color="#87CEEB"></a-sky>
   <a-plane rotation="-90 0 0" width="60" height="60" color="#7BC8A4"></a-plane>
 
   <!-- Airport -->
-  <a-box position="-8 2 -10" color="blue" class="hotspot" data-location="airport"></a-box>
-  <a-text value="Airport" position="-8 4 -10" align="center"></a-text>
+  <a-box position="-8 2 -10"
+         color="blue"
+         class="hotspot"
+         data-location="airport">
+  </a-box>
+  <a-text value="Airport"
+          position="-8 4 -10"
+          align="center">
+  </a-text>
 
   <!-- Metro -->
-  <a-box position="0 2 -15" color="red" class="hotspot" data-location="metro"></a-box>
-  <a-text value="Metro" position="0 4 -15" align="center"></a-text>
+  <a-box position="0 2 -15"
+         color="red"
+         class="hotspot"
+         data-location="metro">
+  </a-box>
+  <a-text value="Metro"
+          position="0 4 -15"
+          align="center">
+  </a-text>
 
   <!-- Campus -->
-  <a-box position="8 2 -10" color="purple" class="hotspot" data-location="campus"></a-box>
-  <a-text value="Campus" position="8 4 -10" align="center"></a-text>
+  <a-box position="8 2 -10"
+         color="purple"
+         class="hotspot"
+         data-location="campus">
+  </a-box>
+  <a-text value="Campus"
+          position="8 4 -10"
+          align="center">
+  </a-text>
 
-  <a-entity camera look-controls wasd-controls position="0 1.6 5"></a-entity>
+  <a-entity camera
+            look-controls
+            wasd-controls
+            position="0 1.6 5">
+  </a-entity>
+
 </a-scene>
 
 <!-- Load JS in this order -->
