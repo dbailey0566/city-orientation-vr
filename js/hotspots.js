@@ -128,14 +128,15 @@
     const exportBtn = document.getElementById("exportBtn");
     if (!exportBtn) return;
     exportBtn.addEventListener("click", () => window.AppData.downloadResults());
-    
+  }
+
   function initHotspots() {
     console.log("Hotspots initialized");
     attachHotspotListeners();
     attachExportButton();
   }
 
-
   // Expose init so index.html can call it after DOM loads
   window.AppHotspots = { initHotspots };
 })();
+
