@@ -100,4 +100,41 @@
 
   function saveResponse(correct, timeSpentSec) {
     const confidenceEl = document.getElementById("confidence");
-    const confidence = confidence
+    const confidence = confidenceEl ? Number(confidenceEl.value) : 3;
+
+    // Save event through the data module
+    window.AppData.addEvent({
+      location: currentLocation,
+      correct,
+      confidence,
+      timeSpent: timeSpentSec
+    });
+
+    const { overlay } = getOverlayEls();
+    overlay.style.display = "none";
+  }
+
+  function attachHotspotListeners() {
+    const nodes = document.querySelectorAll(".hotspot");
+    nodes.forEach((el) => {
+      el.addEventListener("click", () => {
+        const loc = el.getAttribute("data-location");
+        openLocation(loc);
+      });
+    });
+  }
+
+  function attachExportButton() {
+    const exportBtn = document.getElementById("exportBtn");
+    if (!exportBtn) return;
+    exportBtn.addEventListener("click", () => window.AppData.downloadResults());
+  }
+
+  function initHotspots() {
+    attachHotspotListeners();
+    attachExportButton();
+  }
+
+  // Expose init so index.html can call it after DOM loads
+  window.AppHotspots = { initHotspots };
+})();
