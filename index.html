@@ -1,14 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Orientation VR</title>
-    <link rel="stylesheet" href="css/styles.css">
+  <meta charset="utf-8">
+  <title>City Orientation VR - Prototype</title>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
-    <div id="container"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="js/hotspots.js"></script>
+
+<button id="exportBtn" class="btn">Download Results</button>
+
+<div id="overlay">
+  <h2 id="locationTitle"></h2>
+  <p id="locationInfo"></p>
+  <div id="questionBlock"></div>
+</div>
+
+<a-scene>
+  <a-sky color="#87CEEB"></a-sky>
+  <a-plane rotation="-90 0 0" width="60" height="60" color="#7BC8A4"></a-plane>
+
+  <!-- Airport -->
+  <a-box position="-8 2 -10" color="blue" class="hotspot" data-location="airport"></a-box>
+  <a-text value="Airport" position="-8 4 -10" align="center"></a-text>
+
+  <!-- Metro -->
+  <a-box position="0 2 -15" color="red" class="hotspot" data-location="metro"></a-box>
+  <a-text value="Metro" position="0 4 -15" align="center"></a-text>
+
+  <!-- Campus -->
+  <a-box position="8 2 -10" color="purple" class="hotspot" data-location="campus"></a-box>
+  <a-text value="Campus" position="8 4 -10" align="center"></a-text>
+
+  <a-entity camera look-controls wasd-controls position="0 1.6 5"></a-entity>
+</a-scene>
+
+<!-- Load JS in this order -->
+<script src="js/data.js"></script>
+<script src="js/hotspots.js"></script>
+<script src="js/scene.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.AppHotspots) window.AppHotspots.initHotspots();
+    if (window.AppScene) window.AppScene.initScene();
+  });
+</script>
+
 </body>
 </html>
