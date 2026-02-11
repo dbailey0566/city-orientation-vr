@@ -150,20 +150,25 @@
 
   function attachHotspotListeners() {
     const nodes = document.querySelectorAll(".hotspot");
-
+  
     nodes.forEach((el) => {
       el.addEventListener("click", () => {
         const loc = el.getAttribute("data-location");
-
+  
+        console.log("CLICKED:", loc);
+        console.log("Unlocked?", isUnlocked(loc));
+        console.log("Completed set:", completedLocations);
+  
         if (!isUnlocked(loc)) {
           alert("Complete the previous location first.");
           return;
         }
-
+  
         openLocation(loc);
       });
     });
   }
+
 
   function attachExportButton() {
     const exportBtn = document.getElementById("exportBtn");
