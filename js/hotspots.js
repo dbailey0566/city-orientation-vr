@@ -29,6 +29,7 @@
 
   const completedLocations = new Set();
   const locationOrder = ["airport", "metro", "campus"];
+  let orientationComplete = false;
 
   let currentLocation = null;
   let openTimeMs = null;
@@ -70,6 +71,62 @@
         el.setAttribute("opacity", 1);
       }
     });
+  }
+
+  function showCompletionScreen() {
+    orientationComplete = true;
+
+    const { overlay, titleEl, infoEl, questionBlock } = getOverlayEls();
+
+    titleEl.textContent = "Orientation Complete";
+    infoEl.textContent = "You have completed all required locations.";
+
+    questionBlock.innerHTML = "";
+
+    const confLabel = document.createElement("p");
+    confLabel.textContent = "Overall, how prepared do you feel for arrival? (1 low - 5 high)";
+    questionBlock.appendChild(confLabel);
+
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.min = "1";
+    slider.max = "5";
+    slider.value = "3";
+    slider.id = "finalConfidence";
+    questionBlock.appendChild(slider);
+
+    const reflectionLabel = document.createElement("p");
+    reflectionLabel.textContent = "What concerns or questions remain?";
+    questionBlock.appendChild(reflectionLabel);
+
+    const textarea = document.createElement("textarea");
+    textarea.id = "finalReflection";
+    textarea.rows = 4;
+    textarea.style.width = "100%";
+    questionBlock.appendChild(textarea);
+
+    const finishBtn = document.createElement("button");
+    finishBtn.className = "btn";
+    finishBtn.textContent = "Finish Orientation";
+    finishBtn.addEventListener("click", saveFinalReflection);
+    questionBlock.appendChild(finishBtn);
+
+    overlay.style.display = "block";
+  }
+
+  function saveFinalReflection() {
+    const finalConfidence = Number(document.getElementById("finalConfidence").value);
+    const finalReflection = document.getElementById("finalReflection").value;
+
+    window.AppData.sessionData.finalReflection = {
+      finalConfidence,
+      finalReflection
+    };
+
+    const { overlay } = getOverlayEls();
+    overlay.style.display = "none";
+
+    alert("Orientation complete. You may now download your results.");
   }
 
   function openLocation(loc) {
@@ -144,31 +201,31 @@
     updateProgress();
     updateLockedVisuals();
 
+    if (completedLocations.size === locationOrder.length && !orientationComplete) {
+      showCompletionScreen();
+      return;
+    }
+
     const { overlay } = getOverlayEls();
     overlay.style.display = "none";
   }
 
   function attachHotspotListeners() {
     const nodes = document.querySelectorAll(".hotspot");
-  
+
     nodes.forEach((el) => {
       el.addEventListener("click", () => {
         const loc = el.getAttribute("data-location");
-  
-        console.log("CLICKED:", loc);
-        console.log("Unlocked?", isUnlocked(loc));
-        console.log("Completed set:", completedLocations);
-  
+
         if (!isUnlocked(loc)) {
           alert("Complete the previous location first.");
           return;
         }
-  
+
         openLocation(loc);
       });
     });
   }
-
 
   function attachExportButton() {
     const exportBtn = document.getElementById("exportBtn");
