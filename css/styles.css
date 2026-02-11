@@ -36,3 +36,14 @@ body {
   right: 10px;
   z-index: 1100;
 }
+#progressTracker {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: white;
+  border: 1px solid #333;
+  padding: 8px 12px;
+  z-index: 1100;
+  font-weight: bold;
+}
+
