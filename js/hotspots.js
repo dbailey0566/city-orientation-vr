@@ -111,8 +111,11 @@
   }
 
   function saveResponse(correct, timeSpentSec) {
+    console.log("SAVE CLICKED:", currentLocation);
+  
     const confidenceEl = document.getElementById("confidence");
     const confidence = confidenceEl ? Number(confidenceEl.value) : 3;
+
 
     // Save event through data module
     window.AppData.addEvent({
